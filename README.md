@@ -48,10 +48,15 @@ optimism-scripts/script-lib/src/index.ts
 ## For contract deployment flow:
 
 cd optimism-scripts/contracts
+
 forge build
+
 forge test
+
 source .env
+
 forge script script/Counter.s.sol --rpc-url $RPC_URL --private-key $PRIVATE_KEY --broadcast
+
 
 To extract the deployed contract's ABI:
 
