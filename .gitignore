@@ -3,6 +3,7 @@ contracts/out/*
 contracts/cache/*
 contracts/.env
 contracts/docs/
+contracts/lib/forge-std/package-lock.json
 
 script-lib/dist
 script-lib/node_modules
