@@ -1,0 +1,21 @@
+{
+  "name": "scripts",
+  "version": "1.0.0",
+  "description": "testing out optimism scripts",
+  "main": "dist/index.js",
+  "type": "module",
+  "scripts": {
+    "start": "rm -rf dist && tsc && node dist/index.js"
+  },
+  "author": "Kiran Yallabandi",
+  "license": "ISC",
+  "dependencies": {
+    "dotenv": "^16.4.7",
+    "pnpm": "^10.6.5",
+    "viem": "^2.23.13"
+  },
+  "devDependencies": {
+    "@types/node": "^22.13.10",
+    "typescript": "^5.8.2"
+  }
+}

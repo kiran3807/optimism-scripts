@@ -1,0 +1,9 @@
+contracts/broadcast/*
+contracts/out/*
+contracts/cache/*
+contracts/.env
+contracts/docs/
+
+script-lib/dist
+script-lib/node_modules
+script-lib/.env
