@@ -1,16 +1,20 @@
-import { 
-    createPublicClient, createWalletClient, 
-    http, formatEther, parseEther, decodeEventLog
+import {  
+    parseEther, decodeEventLog
 } from "viem";
-import { optimismSepolia, sepolia } from "viem/chains";
 import { 
-    publicActionsL2, walletActionsL2, publicActionsL1,
-    walletActionsL1, getL2TransactionHashes 
-} from "viem/op-stack";
-import { privateKeyToAccount, PrivateKeyAccount, Address } from "viem/accounts";
-import dotenv from "dotenv";
+    getTransactionCount 
+} from 'viem/actions'
+import { 
+    PrivateKeyAccount, Address 
+} from "viem/accounts";
 
+import { 
+    OptimismLocal, OptimismSepolia, EthSepolia, 
+    accountLocal, accountSepolia, L1Interactor, L2Interactor,
+    GREETER_CONTRACT_LOCAL, GREETER_CONTRACT_SEPOLIA, t
+} from './config.js';
 import { GREETER_ABI } from "./constants.js";
+import { optopia } from "viem/chains";
 
 /*
     Relevant documentation:
@@ -18,49 +22,6 @@ import { GREETER_ABI } from "./constants.js";
     https://docs.optimism.io/app-developers/tutorials/bridging/cross-dom-bridge-eth
 */
 
-dotenv.config();
-
-const PRIVATE_KEY = process.env.PRIVATE_KEY || "";
-const PUBLIC_KEY = process.env.PUBLIC_KEY || "";
-const GREETER_CONTRACT = "0x97daE37258eD466A0430BeA56Ea49A495e481871";
-const SEPOLIA_RPC = "https://ethereum-sepolia-rpc.publicnode.com";
-const OPTIMISM_RPC = "https://sepolia.optimism.io";
-
-
-const account: PrivateKeyAccount = privateKeyToAccount(`0x${PRIVATE_KEY}`);
-
-const EthTestnet = {
-    
-    provider : createPublicClient({
-        chain: sepolia,
-        transport: http(SEPOLIA_RPC),
-    }).extend(publicActionsL1()),
-
-    wallet : createWalletClient({
-        account : account,
-        chain: sepolia,
-        transport: http(SEPOLIA_RPC),
-    }).extend(walletActionsL1())
-}
-
-const Optimism = {
-
-    provider : createPublicClient({
-        chain: optimismSepolia,
-        transport: http(OPTIMISM_RPC),
-    }).extend(publicActionsL2()),
-
-    wallet : createWalletClient({
-        account: account,
-        chain: optimismSepolia,
-        transport: http(OPTIMISM_RPC),
-    }).extend(walletActionsL2()),
-    
-    getL2TransactionHashes : getL2TransactionHashes
-}
-
-type L1Interactor = typeof EthTestnet;
-type L2Interactor = typeof Optimism;
 
 async function getWrappedEthereum(
     account: PrivateKeyAccount, 
@@ -104,15 +65,20 @@ async function invokeGreeter(contractAddress: Address, contractAbi: any, account
 
         //state changing functions 
 
+        const onChainNonce = await optimism.provider.getTransactionCount({
+            address : account.address
+        });
+
         const setNumberTxHash = await optimism.wallet.writeContract({
             address: contractAddress,
             abi: contractAbi,
             functionName: 'setNumber',
             account,
-            args:[13]
+            args:[13],
+            nonce : onChainNonce
         });
 
-        const setNumberReceipt = await Optimism.provider.waitForTransactionReceipt({
+        const setNumberReceipt = await optimism.provider.waitForTransactionReceipt({
             hash: setNumberTxHash,
             timeout : 500_000
         });
@@ -125,7 +91,7 @@ async function invokeGreeter(contractAddress: Address, contractAbi: any, account
             args: []
         });
 
-        const incrementReceipt = await Optimism.provider.waitForTransactionReceipt({
+        const incrementReceipt = await optimism.provider.waitForTransactionReceipt({
             hash: incrementTxHash,
             timeout : 500_000
         });
@@ -154,9 +120,12 @@ async function invokeGreeter(contractAddress: Address, contractAbi: any, account
 }
 
 
-// const l1Balance = await EthTestNet.provider.getBalance({ address: account.address });
+// const l1Balance = await EthSepolia.provider.getBalance({ address: accountSepolia.address });
 // console.log(`Ethereum testnet Balance: ${formatEther(l1Balance)} ETH`);
 
-// const reciept = await getWrappedEthereum(account, EthTestnet, Optimism);
+// const reciept = await getWrappedEthereum(accountSepolia, EthSepolia, OptimismSepolia);
 
-await invokeGreeter(GREETER_CONTRACT, GREETER_ABI, account, Optimism);
+
+// await invokeGreeter(GREETER_CONTRACT_LOCAL as Address, GREETER_ABI, accountLocal, OptimismLocal);
+
+await invokeGreeter(GREETER_CONTRACT_SEPOLIA as Address, GREETER_ABI, accountSepolia, OptimismSepolia);
