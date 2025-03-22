@@ -27,11 +27,39 @@ npm install
 
 pnpm install.
 
-Create a .env file and populate it with PUBLIC_KEY and PRIVATE_KEY variables
+Create a .env file and populate it with the following variables:
+
+PRIVATE_KEY_SEPOLIA
+
+PUBLIC_KEY_SEPOLIA
+
+PRIVATE_KEY_LOCAL
+
+PUBLIC_KEY_LOCAL
+
+OPTIMISM_LOCAL_RPC
+
+OPTIMISM_SEPOLIA_RPC
+
+SEPOLIA_RPC
+
+GREETER_CONTRACT_SEPOLIA
+
+GREETER_CONTRACT_LOCAL
 
 Then cd into optimism-scripts/contracts
 
-Create another .env file and populate it with RPC_URL=https://sepolia.optimism.io and PRIVATE_KEY
+Create another .env file and populate it with:
+
+RPC_URL
+
+PRIVATE_KEY. 
+
+The RPC_URL and PRIVATE_KEY must correspond to the Optimism chain you are interacting, whether it be test, main or local
+
+In another terminal instance, run the following command to setup a local mainnet fork of Optimism node:
+
+anvil --fork-url https://mainnet.optimism.io --chain-id 31337
 
 # Usage:
 
