@@ -8,3 +8,6 @@ contracts/lib/forge-std/package-lock.json
 script-lib/dist
 script-lib/node_modules
 script-lib/.env
+script-lib/.kurtosis-env
+
+artefacts
